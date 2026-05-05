@@ -42,3 +42,58 @@ void insert_fail(HashTable *table, char *ip) {
     new_node->next = table->buckets[index];
     table->buckets[index] = new_node;
 }
+
+void insert_fail(HashTable *table, char *ip) {
+    unsigned int index = hash(ip);
+    Node *node = find(table, ip);
+
+    if (node) {
+        node->fail_count++;
+        return;
+    }
+
+    Node *new_node = (Node*)malloc(sizeof(Node));
+    if (!new_node) return; // Safety check for malloc failure
+
+    strncpy(new_node->ip, ip, 49);
+    new_node->ip[49] = '\0';
+    new_node->fail_count = 1;
+    new_node->next = table->buckets[index];
+    table->buckets[index] = new_node;
+}
+
+// NEW: Cleanup function to prevent memory leaks
+void free_table(HashTable *table) {
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Node *curr = table->buckets[i];
+        while (curr) {
+            Node *temp = curr;
+            curr = curr->next;
+            free(temp);
+        }
+        table->buckets[i] = NULL;
+    }
+}
+
+void analyze_logs(FILE *fp) {
+    char line[256];
+    LogEntry entry;
+    HashTable table;
+
+    init_table(&table); //[cite: 6]
+
+    while (fgets(line, sizeof(line), fp)) {
+        if (!parse_log_line(line, &entry)) continue;
+
+        if (strcmp(entry.event, "FAIL") == 0) {
+            insert_fail(&table, entry.ip);
+            Node *node = find(&table, entry.ip);
+            
+            // Check for NULL before accessing fail_count[cite: 6]
+            if (node && node->fail_count == THRESHOLD) {
+                printf("[ALERT] Brute-force suspected from IP: %s\n", entry.ip);
+            }
+        }
+    }
+    free_table(&table); // Prevent memory leaks
+}
