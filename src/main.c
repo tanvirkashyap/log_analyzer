@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "analyzer.h" // Added missing header[cite: 1]
-
+# include "cli.h"
 int main() {
     FILE *fp = fopen("data/sample.log", "r");
     if (!fp) {
