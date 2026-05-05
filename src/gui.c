@@ -6,15 +6,15 @@ GtkTextBuffer *buffer;
 
 void on_button_clicked(GtkWidget *widget, gpointer data) {
     FILE *fp = fopen("data/sample.log", "r");
-    if (!fp) return;
+    if (!fp) {
+        gtk_text_buffer_set_text(buffer, "Error: Could not open data/sample.log", -1);
+        return;
+    }
 
-    analyze_logs(fp); // currently prints to stdout
-
-    gtk_text_buffer_set_text(buffer, "Analysis Complete\n(Check terminal for now)", -1);
-
+    analyze_logs(fp); 
+    gtk_text_buffer_set_text(buffer, "Analysis Complete. Check terminal for alerts.", -1);
     fclose(fp);
 }
-
 void start_gui(int argc, char *argv[]) {
     gtk_init(&argc, &argv);
 
