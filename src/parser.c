@@ -3,8 +3,13 @@
 #include "parser.h"
 
 int parse_log_line(char *line, LogEntry *entry) {
-    // Example format:
-    // "2026-04-25 10:15:32 user=admin ip=192.168.1.8 event=FAIL"
+    // Expected format: 2026-05-05 admin 192.168.1.1 FAIL
+    return sscanf(line, "%29s %49s %49s %19s", 
+                  entry->timestamp, 
+                  entry->user, 
+                  entry->ip, 
+                  entry->event) == 4;
+}
 
     char *token = strtok(line, " ");
     if (!token) return 0;
