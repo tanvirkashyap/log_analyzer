@@ -15,10 +15,13 @@ log_analyzer: $(OBJ_DIR)/main.o $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
 # GUI version (requires GTK3)
-gui: $(OBJ) $(OBJ_DIR)/gui.o
-	$(CC) $(CFLAGS) -o log_analyzer_gui $^ $(GTK_FLAGS)
+gui: $(OBJ) $(OBJ_DIR)/gui.o $(OBJ_DIR)/gui_main.o
+	$(CC) $(CFLAGS) -o log_analyzer_gui $^ $(GTK_FLAGS) -mwindows
 
 $(OBJ_DIR)/gui.o: $(SRC_DIR)/gui.c | $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< $(GTK_FLAGS) -o $@
+
+$(OBJ_DIR)/gui_main.o: $(SRC_DIR)/gui_main.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< $(GTK_FLAGS) -o $@
 
 # Compile object files into obj/
