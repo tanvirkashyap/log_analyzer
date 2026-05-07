@@ -10,7 +10,7 @@ void analyze_logs(FILE *fp) {
     LogEntry entry;
     HashTable table;
 
-    init_table(&table); //[cite: 6]
+    init_table(&table);
 
     while (fgets(line, sizeof(line), fp)) {
         if (!parse_log_line(line, &entry)) continue;
@@ -18,12 +18,11 @@ void analyze_logs(FILE *fp) {
         if (strcmp(entry.event, "FAIL") == 0) {
             insert_fail(&table, entry.ip);
             Node *node = find(&table, entry.ip);
-            
-            // Check for NULL before accessing fail_count[cite: 6]
-            if (node && node->fail_count == THRESHOLD) {
+
+            if (node && node->fail_count >= THRESHOLD) {
                 printf("[ALERT] Brute-force suspected from IP: %s\n", entry.ip);
             }
         }
     }
-    free_table(&table); // Prevent memory leaks
+    free_table(&table);
 }
