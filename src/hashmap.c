@@ -27,21 +27,7 @@ Node* find(HashTable *table, char *ip) {
     return NULL;
 }
 
-void insert_fail(HashTable *table, char *ip) {
-    unsigned int index = hash(ip);
-    Node *node = find(table, ip);
 
-    if (node) {
-        node->fail_count++;
-        return;
-    }
-
-    Node *new_node = (Node*)malloc(sizeof(Node));
-    strcpy(new_node->ip, ip);
-    new_node->fail_count = 1;
-    new_node->next = table->buckets[index];
-    table->buckets[index] = new_node;
-}
 
 void insert_fail(HashTable *table, char *ip) {
     unsigned int index = hash(ip);
@@ -75,25 +61,3 @@ void free_table(HashTable *table) {
     }
 }
 
-void analyze_logs(FILE *fp) {
-    char line[256];
-    LogEntry entry;
-    HashTable table;
-
-    init_table(&table); //[cite: 6]
-
-    while (fgets(line, sizeof(line), fp)) {
-        if (!parse_log_line(line, &entry)) continue;
-
-        if (strcmp(entry.event, "FAIL") == 0) {
-            insert_fail(&table, entry.ip);
-            Node *node = find(&table, entry.ip);
-            
-            // Check for NULL before accessing fail_count[cite: 6]
-            if (node && node->fail_count == THRESHOLD) {
-                printf("[ALERT] Brute-force suspected from IP: %s\n", entry.ip);
-            }
-        }
-    }
-    free_table(&table); // Prevent memory leaks
-}
