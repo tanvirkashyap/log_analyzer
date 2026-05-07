@@ -19,5 +19,6 @@ void init_table(HashTable *table);
 unsigned int hash(char *key);
 void insert_fail(HashTable *table, char *ip);
 Node* find(HashTable *table, char *ip);
+void free_table(HashTable *table);
 
 #endif
