@@ -27,8 +27,6 @@ Node* find(HashTable *table, char *ip) {
     return NULL;
 }
 
-
-
 void insert_fail(HashTable *table, char *ip) {
     unsigned int index = hash(ip);
     Node *node = find(table, ip);
@@ -60,4 +58,3 @@ void free_table(HashTable *table) {
         table->buckets[i] = NULL;
     }
 }
-
